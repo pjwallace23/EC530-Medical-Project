@@ -9,23 +9,14 @@ def main():
     logging.info("main function started")
     while(1):
         print('Welcome to the medical application shell\n')
-        func_to_do = input('Enter device or user: \n')
-        if func_to_do == 'device':
-            dev_id = input('device id: \n')
-            dev_type = input('dev_type: \n')
-            pat_id = input('pat_id: \n')
-            data = input('device data: \n')
-            system.add_device(dev_id, dev_type, pat_id, data)
-        elif func_to_do == 'user':
-            role = input('user role: \n')
-            user_id = input('user id: \n')
-            first = input('user first name: \n')
-            last = input('user last name: \n')
-            age = input('user age: \n')
-            height = input('user height: \n')
-            weight = input('user weight: \n')
-            system.add_user(role, user_id, first, last, age, height, weight)
-        else sys.stderr.write('invald input')
+        file_to_input = input('Enter the device file to input: \n')
+        if isinstance(file_to_input, str):
+            system.send_data(file_to_input)
+            logging.info("{file_to_input} sent to the database\n")
+        else:
+            logging.info("invalid input\n")
+            sys.stderr.write('invald input\n')
+        
         exit_code = input('Enter q to quit application, anything else to continue: ')
         if exit_code == 'q':
             sys.exit()
