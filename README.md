@@ -17,4 +17,5 @@ API documentation below:
 All API URL's start with http://ec2-44-201-124-224.compute-1.amazonaws.com
  
 # Project 4
-
+Located in the queueing-system folder. Test located in the main function of the .py file. Proof of concept phase, to be deployed with the device and chat modules later.
+ 
