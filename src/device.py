@@ -3,15 +3,7 @@ from classes import Device
 import json
 import logging
 import sys
-
-active_users = {}
-active_devices = {}
-database = "database.json"
-
-def add_user(role, user_id, first, last, age, height, weight):
-    new_device = User(role, user_id, first, last, age, height, weight)
-    active_users[user_id] = new_device
-    return 1
+import sqlite3
 
 def add_device(dev_id, dev_type, pat_id, data):
     new_device = Device(dev_id, dev_type, pat_id,data)
@@ -32,7 +24,7 @@ def check_filetype(filename: str): # --> check filetype (1 if json, 0 if anythin
         return 1
 
 def validate_json(Json_file: str): # --> return 1 if valid json, 0 if not
-    expected_keys = ['dev_id', 'dev_type', 'pat_id', 'data']
+    expected_keys = ['dev_id', 'dev_type', 'pat_id', 'b_pressure', 'pulse', 'weight', 'oximeter', 'temperature']
     is_json = check_filetype(Json_file)
 
     if is_json:
@@ -41,7 +33,7 @@ def validate_json(Json_file: str): # --> return 1 if valid json, 0 if not
         data = json.load(fp)
         json_keys = data.keys()
 
-        if (len(json_keys) != 4):
+        if (len(json_keys) != 8):
             logging.info("wrong amount of keys")
             return 0
 
@@ -57,7 +49,10 @@ def validate_json(Json_file: str): # --> return 1 if valid json, 0 if not
         return 0
 
 def send_data(Json_file: str): #  --> send a json file to the database
-    
+
+    conn = sqlite3.connect("medical_app.db")
+    c = conn.cursor()
+
     val = validate_json(Json_file)
     if val == 0:
         return 0
@@ -66,9 +61,23 @@ def send_data(Json_file: str): #  --> send a json file to the database
         open(Json_file, 'r') as fp
         json_data = json.load(fp)
 
-        open(database, 'w') as db
-        json.dump(json_data, db, ensure_ascii=False, indent=4)
-        logging.info("successfully exported")
+        d_id = json_data['dev_id']
+        d_type = json_data['dev_type']
+        p_id = json_data['pat_id']
+        bp = json_data['b_pressure']
+        pulse = json_data['pulse']
+        weight = json_data['weight']
+        o = json_data['oximeter']
+        temp = json_data['temperature']
+
+        c.execute("INSERT INTO device_data (dev_id, dev_type, pat_id, weight, temp, b_pressure, oximeter, pulse) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        (d_id, d_type, p_id, weight, temp, bp, o, pulse))
+        
+        conn.commit()
+        c.close()
+        conn.close()
+
+       
         return 1
 
         
